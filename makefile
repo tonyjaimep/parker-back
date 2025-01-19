@@ -1,10 +1,10 @@
-db-generate:
+db-generate: start
 	docker compose exec server drizzle-kit generate --name $(NAME)
 
-db-migrate:
+db-migrate: start
 	docker compose exec server drizzle-kit migrate
 
-db-reset:
+db-reset: start
 	docker compose down db
 	docker volume rm parker-back_db-data
 	docker compose up db -d

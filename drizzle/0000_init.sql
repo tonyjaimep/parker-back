@@ -1,0 +1,65 @@
+CREATE TYPE "public"."currency" AS ENUM('mxn', 'usd');--> statement-breakpoint
+CREATE TYPE "public"."lot_roles" AS ENUM('manager', 'employee');--> statement-breakpoint
+CREATE TABLE "lots_to_users" (
+	"role" "lot_roles",
+	"user_id" integer,
+	"lot_id" integer
+);
+--> statement-breakpoint
+CREATE TABLE "lot" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" varchar NOT NULL,
+	"default_price_id" integer,
+	"address" varchar NOT NULL,
+	"location" geometry(point) NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "price" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"name" varchar,
+	"currency" "currency" DEFAULT 'mxn' NOT NULL,
+	"amount" integer NOT NULL,
+	"lot_id" integer NOT NULL,
+	"base_amount" integer NOT NULL,
+	"hourly_rate" integer NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "reservations" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"user_id" integer,
+	"spot_id" integer NOT NULL,
+	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp DEFAULT now(),
+	"starts_at" timestamp DEFAULT now() NOT NULL,
+	"ends_at" timestamp,
+	"price_id" integer
+);
+--> statement-breakpoint
+CREATE TABLE "spots" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"lot_id" integer NOT NULL,
+	"price_id" integer,
+	"is_available" boolean DEFAULT true,
+	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE "user" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"firebase_user_id" varchar NOT NULL,
+	"full_name" varchar NOT NULL,
+	"display_name" varchar NOT NULL,
+	"created_at" timestamp DEFAULT now(),
+	"updated_at" timestamp DEFAULT now(),
+	CONSTRAINT "user_firebaseUserId_unique" UNIQUE("firebase_user_id")
+);
+--> statement-breakpoint
+ALTER TABLE "lots_to_users" ADD CONSTRAINT "lots_to_users_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "lots_to_users" ADD CONSTRAINT "lots_to_users_lot_id_lot_id_fk" FOREIGN KEY ("lot_id") REFERENCES "public"."lot"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "lot" ADD CONSTRAINT "lot_default_price_id_price_id_fk" FOREIGN KEY ("default_price_id") REFERENCES "public"."price"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "price" ADD CONSTRAINT "price_lot_id_lot_id_fk" FOREIGN KEY ("lot_id") REFERENCES "public"."lot"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "reservations" ADD CONSTRAINT "reservations_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "reservations" ADD CONSTRAINT "reservations_spot_id_spots_id_fk" FOREIGN KEY ("spot_id") REFERENCES "public"."spots"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "reservations" ADD CONSTRAINT "reservations_price_id_price_id_fk" FOREIGN KEY ("price_id") REFERENCES "public"."price"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "spots" ADD CONSTRAINT "spots_lot_id_lot_id_fk" FOREIGN KEY ("lot_id") REFERENCES "public"."lot"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "spots" ADD CONSTRAINT "spots_price_id_price_id_fk" FOREIGN KEY ("price_id") REFERENCES "public"."price"("id") ON DELETE set null ON UPDATE no action;
