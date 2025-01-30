@@ -1,10 +1,38 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { FirebaseModule } from './firebase/firebase.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { DrizzlePGModule } from '@knaadh/nestjs-drizzle-pg';
+import { DB_TAG } from './db/constants';
+import schema from './db/schema';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    DrizzlePGModule.registerAsync({
+      tag: DB_TAG,
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        pg: {
+          connection: 'client',
+          config: {
+            connectionString: configService.getOrThrow('DB_URL'),
+          },
+        },
+        config: {
+          dialect: 'postgresql',
+          casing: 'snake_case',
+          schema: { ...schema },
+        },
+      }),
+    }),
+    ConfigModule.forRoot({ isGlobal: true }),
+    AuthModule,
+    UsersModule,
+    FirebaseModule,
+  ],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

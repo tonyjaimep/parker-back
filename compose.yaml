@@ -5,7 +5,7 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV-production}
       DB_URL: postgresql://${DB_USER-postgres}:${DB_PASSWORD}@${DB_HOST-db}:${DB_PORT-5432}/${DB_DATABASE}?schema=public&connection_limit=${DB_CONNECTION_LIMIT-20}
-      JWT_SECRET: ${JWT_SECRET}
+      GOOGLE_APPLICATION_CREDENTIALS: '/usr/src/app/src/firebase/credentials/service-account-file.json'
     volumes:
       - ./src:/usr/src/app/src
       - ./entrypoint.sh:/usr/src/app/entrypoint.sh
@@ -17,9 +17,7 @@ services:
       db:
         condition: service_healthy
   db:
-    build:
-      context: .
-      dockerfile: ./db.Dockerfile
+    image: postgres
     restart: always
     user: postgres
     volumes:

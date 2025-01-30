@@ -9,6 +9,17 @@ db-reset: start
 	docker volume rm parker-back_db-data
 	docker compose up db -d
 
+build-e2e:
+	docker compose -f test/e2e/compose.yaml up -d --build
+
+start-e2e:
+	docker compose -f test/e2e/compose.yaml up -d
+	docker compose --env-file test/e2e/test.env -f test/e2e/compose.yaml exec testdb npm run db:migrate
+
+test-e2e: start-e2e
+	docker compose --env-file test/e2e/test.env -f test/e2e/compose.yaml exec testdb npm run test:e2e -- --runInBand --detectOpenHandles --forceExit
+	docker compose -f test/e2e/compose.yaml down
+
 up:
 	docker compose up -d --build
 

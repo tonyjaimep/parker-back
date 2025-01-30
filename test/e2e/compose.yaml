@@ -1,0 +1,22 @@
+services:
+  testdb:
+    env_file: "./test.env"
+    build:
+      context: ../../
+      dockerfile: ./test/e2e/testdb.Dockerfile
+    restart: always
+    user: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ../../src:/usr/src/app/src
+      - ../../test:/usr/src/app/test
+      - ../../drizzle:/usr/src/app/drizzle
+    ports:
+      - 5435:5432
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  db-data:
