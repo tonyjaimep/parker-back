@@ -1,25 +1,18 @@
 import * as request from 'supertest';
-import { Test } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import { AppModule } from '../../../src/app.module';
 import { FirebaseService } from '../../../src/firebase/firebase.service';
 import { MockFirebaseService } from '../firebase/firebase.mock.service';
 import { user } from 'src/db/schema/user';
+import { initializeAppModule } from '../utils';
 
 describe('Auth', () => {
   let app: INestApplication;
-
-  const firebaseService = new MockFirebaseService();
+  let firebaseService: MockFirebaseService;
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
-    })
-      .overrideProvider(FirebaseService)
-      .useValue(firebaseService)
-      .compile();
-
+    const moduleRef = await initializeAppModule();
     app = moduleRef.createNestApplication();
+    firebaseService = moduleRef.get(FirebaseService);
     await app.init();
   });
 
@@ -80,10 +73,6 @@ describe('Auth', () => {
         .expect((response) => {
           createdUser = response.body;
         });
-
-      jest
-        .spyOn(firebaseService, 'getValidUserId')
-        .mockImplementationOnce(() => createdUser.firebaseUserId);
 
       return request(app.getHttpServer())
         .get('/users/me')

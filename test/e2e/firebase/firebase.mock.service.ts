@@ -10,13 +10,22 @@ const NON_AVAILABLE_EMAIL_PREFIX = `non-available`;
 export class MockFirebaseService implements FirebaseService {
   constructor() {}
 
+  // ensure consistency in user id when decoding the same token multiple times
+  private tokensToIds = new Map<string, string>();
+
   async decodeIdToken(idToken: string): Promise<DecodedIdToken | null> {
     if (!this.isValidIdToken(idToken)) {
       return null;
     }
 
+    if (!this.tokensToIds.has(idToken)) {
+      this.tokensToIds.set(idToken, this.getValidUserId());
+    }
+
+    const uid = this.tokensToIds.get(idToken);
+
     return {
-      uid: this.getValidUserId(),
+      uid,
       // @ts-expect-error -- not needed
       firebase: {},
     };
