@@ -10,6 +10,7 @@ import schema from 'src/db/schema';
 import { spot } from 'src/db/schema/spot';
 import { eq } from 'drizzle-orm';
 import { lot } from 'src/db/schema/lot';
+import { createLot } from './utils';
 
 describe('Lots', () => {
   let app: INestApplication;
@@ -125,25 +126,17 @@ describe('Lots', () => {
       const ownerCredentials = await generateCredentials();
       const nonOwnerCredentials = await generateCredentials();
 
-      let createdLotId: number;
+      const createLotResponse = await createLot(app, ownerCredentials, {
+        name: 'Example Lot',
+        address: 'Address #123',
+        spotsCount: 20,
+        location: {
+          latitude: 123.456,
+          longitude: 23.456,
+        },
+      });
 
-      // create lot with one user
-      await request(app.getHttpServer())
-        .post('/lots')
-        .send({
-          name: 'Example Lot',
-          address: 'Address #123',
-          spotsCount: 20,
-          location: {
-            latitude: 123.456,
-            longitude: 23.456,
-          },
-        })
-        .auth(ownerCredentials.token, { type: 'bearer' })
-        .expect(201)
-        .then((response) => {
-          createdLotId = response.body.id;
-        });
+      const createdLotId = createLotResponse.body.id;
 
       // patches with different user
       return request(app.getHttpServer())
@@ -157,24 +150,18 @@ describe('Lots', () => {
 
     it('updates the properties of a lot', async () => {
       const credentials = await generateCredentials();
-      let createdLotId: number;
 
-      await request(app.getHttpServer())
-        .post('/lots')
-        .send({
-          name: 'Example Lot',
-          address: 'Address #123',
-          spotsCount: 20,
-          location: {
-            latitude: 123.456,
-            longitude: 23.456,
-          },
-        })
-        .auth(credentials.token, { type: 'bearer' })
-        .expect(201)
-        .then((response) => {
-          createdLotId = response.body.id;
-        });
+      const createLotResponse = await createLot(app, credentials, {
+        name: 'Example Lot',
+        address: 'Address #123',
+        spotsCount: 20,
+        location: {
+          latitude: 123.456,
+          longitude: 23.456,
+        },
+      });
+
+      const createdLotId = createLotResponse.body.id;
 
       return request(app.getHttpServer())
         .patch(`/lots/${createdLotId}`)
@@ -198,16 +185,12 @@ describe('Lots', () => {
 
       await Promise.all(
         testSet.map(async (testAddress) => {
-          await request(app.getHttpServer())
-            .post('/lots')
-            .send({
-              name: `GET /lots test address: ${testAddress}`,
-              address: testAddress,
-              spotsCount: 1,
-              location: { latitude: 1, longitude: 1 },
-            })
-            .auth(credentials.token, { type: 'bearer' })
-            .expect(201);
+          await createLot(app, credentials, {
+            name: `GET /lots test address: ${testAddress}`,
+            address: testAddress,
+            spotsCount: 1,
+            location: { latitude: 1, longitude: 1 },
+          });
         }),
       );
 
@@ -215,7 +198,7 @@ describe('Lots', () => {
         .get('/lots')
         .expect(200)
         .expect((response) => {
-          expect(response.body.length).toBeGreaterThanOrEqual(testSet.length);
+          expect(response.body.length).toBe(testSet.length);
           expect(response.body).toContainEqual(
             expect.objectContaining({ address: testSet[0] }),
           );
@@ -231,25 +214,18 @@ describe('Lots', () => {
       const ownerCredentials = await generateCredentials();
       const nonOwnerCredentials = await generateCredentials();
 
-      let createdLotId: number;
-
       // create lot with one user
-      await request(app.getHttpServer())
-        .post('/lots')
-        .send({
-          name: 'Example Lot',
-          address: 'Address #123',
-          spotsCount: 20,
-          location: {
-            latitude: 123.456,
-            longitude: 23.456,
-          },
-        })
-        .auth(ownerCredentials.token, { type: 'bearer' })
-        .expect(201)
-        .then((response) => {
-          createdLotId = response.body.id;
-        });
+      const createLotResponse = await createLot(app, ownerCredentials, {
+        name: 'Example Lot',
+        address: 'Address #123',
+        spotsCount: 20,
+        location: {
+          latitude: 123.456,
+          longitude: 23.456,
+        },
+      });
+
+      const createdLotId = createLotResponse.body.id;
 
       // patches with different user
       return request(app.getHttpServer())
@@ -261,25 +237,18 @@ describe('Lots', () => {
     it('deletes a lot and its spots', async () => {
       const credentials = await generateCredentials();
 
-      let createdLotId: number;
-
       // create lot with one user
-      await request(app.getHttpServer())
-        .post('/lots')
-        .send({
-          name: 'Example Lot',
-          address: 'Address #123',
-          spotsCount: 20,
-          location: {
-            latitude: 123.456,
-            longitude: 23.456,
-          },
-        })
-        .auth(credentials.token, { type: 'bearer' })
-        .expect(201)
-        .then((response) => {
-          createdLotId = response.body.id;
-        });
+      const createLotResponse = await createLot(app, credentials, {
+        name: 'Example Lot',
+        address: 'Address #123',
+        spotsCount: 20,
+        location: {
+          latitude: 123.456,
+          longitude: 23.456,
+        },
+      });
+
+      const createdLotId = createLotResponse.body.id;
 
       await request(app.getHttpServer())
         .delete(`/lots/${createdLotId}`)
