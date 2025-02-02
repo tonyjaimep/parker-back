@@ -3,17 +3,21 @@ import { INestApplication } from '@nestjs/common';
 import { FirebaseService } from '../../../src/firebase/firebase.service';
 import { MockFirebaseService } from '../firebase/firebase.mock.service';
 import { user } from 'src/db/schema/user';
-import { initializeAppModule } from '../utils';
+import { initializeE2eTestApp, truncateAllTables } from '../utils';
+import { DbService } from 'src/db/db.service';
 
 describe('Auth', () => {
   let app: INestApplication;
   let firebaseService: MockFirebaseService;
 
   beforeAll(async () => {
-    const moduleRef = await initializeAppModule();
-    app = moduleRef.createNestApplication();
-    firebaseService = moduleRef.get(FirebaseService);
+    app = await initializeE2eTestApp();
+    firebaseService = app.get(FirebaseService);
     await app.init();
+  });
+
+  afterEach(async () => {
+    await truncateAllTables(app.get(DbService).db);
   });
 
   describe('GET /auth/email/check', () => {

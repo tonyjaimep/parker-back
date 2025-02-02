@@ -7,11 +7,13 @@ import {
   Req,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { UsersService } from './users.service';
 import { RegisterUserRequestDto } from './dto/register-user.dto';
 import { UpdateUserRequestDto } from './dto/update-user.dto';
 import { UseAuth } from 'src/auth/decorators/use-auth.decorator';
+import { User } from 'src/auth/decorators/user.decorator';
+import { UserSelect } from './types';
+import { Request } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -19,12 +21,12 @@ export class UsersController {
 
   @UseAuth()
   @Get('me')
-  async getUser(@Req() req: Request) {
-    const user = await this.usersService.getUserById(req.user.id);
-    if (!user) {
+  async getUser(@User() user: UserSelect) {
+    const selectedUser = await this.usersService.getUserById(user.id);
+    if (!selectedUser) {
       throw new UnauthorizedException();
     }
-    return user;
+    return selectedUser;
   }
 
   @Post('me')
@@ -47,18 +49,21 @@ export class UsersController {
 
   @UseAuth()
   @Patch('me')
-  async updateUser(@Req() req: Request, @Body() body: UpdateUserRequestDto) {
-    return this.usersService.updateUser(req.user.id, body);
+  async updateUser(
+    @User() user: UserSelect,
+    @Body() body: UpdateUserRequestDto,
+  ) {
+    return this.usersService.updateUser(user.id, body);
   }
 
   @UseAuth()
   @Get('is-verified')
-  async getIsUserVerified(@Req() req: Request) {
-    if (!req.user) {
+  async getIsUserVerified(@User() user: UserSelect) {
+    if (!user) {
       throw new UnauthorizedException();
     }
 
-    const isVerified = await this.usersService.isUserVerified(req.user);
+    const isVerified = await this.usersService.isUserVerified(user);
 
     return { isVerified };
   }

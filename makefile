@@ -18,6 +18,8 @@ start-e2e:
 
 test-e2e: start-e2e
 	docker compose --env-file test/e2e/test.env -f test/e2e/compose.yaml exec testdb npm run test:e2e -- --runInBand --detectOpenHandles --forceExit
+
+kill-e2e:
 	docker compose -f test/e2e/compose.yaml down
 
 up:
