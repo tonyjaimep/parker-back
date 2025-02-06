@@ -1,10 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { DbService } from '../db/db.service';
-import { LotEditableFields } from './types';
+import { Bounds, Coordinates, LotEditableFields } from './types';
 import { lot } from 'src/db/schema/lot';
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, gte, lte, sql } from 'drizzle-orm';
 import { lotsToUsers } from 'src/db/schema/lot-to-users';
 import { spot } from 'src/db/schema/spot';
+import { reservation } from 'src/db/schema/reservation';
+import { PgSelect } from 'drizzle-orm/pg-core';
 
 @Injectable()
 export class LotsService {
@@ -66,8 +68,42 @@ export class LotsService {
     return updatedLots[0];
   }
 
-  async getLots() {
-    return this.dbService.db.select().from(lot);
+  async getLots(config: { withAvailability?: boolean; bounds?: Bounds }) {
+    let query = this.dbService.db
+      .select(
+        config.withAvailability
+          ? {
+              ...lot,
+              availability: sql<number>`COUNT(${spot.id}) - COUNT(${reservation.id})`,
+            }
+          : lot,
+      )
+      .from(lot)
+      .where(
+        config.bounds
+          ? sql`ST_Contains(ST_MakeEnvelope(${
+              config.bounds.southWest.longitude
+            }, ${config.bounds.southWest.latitude}, ${
+              config.bounds.northEast.longitude
+            }, ${config.bounds.northEast.latitude}, 4326), ${lot.location})`
+          : undefined,
+      );
+
+    if (config.withAvailability) {
+      return query
+        .leftJoin(spot, eq(lot.id, spot.lotId))
+        .leftJoin(
+          reservation,
+          and(
+            eq(spot.id, reservation.spotId),
+            lte(reservation.startsAt, new Date()),
+            gte(reservation.endsAt, new Date()),
+          ),
+        )
+        .groupBy(lot.id);
+    }
+
+    return query;
   }
 
   async deleteLot(lotId: number) {

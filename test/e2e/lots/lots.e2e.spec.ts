@@ -11,6 +11,8 @@ import { spot } from 'src/db/schema/spot';
 import { eq } from 'drizzle-orm';
 import { lot } from 'src/db/schema/lot';
 import { createLot } from './utils';
+import { stringify } from 'qs';
+import { Bounds, LotSelect } from 'src/lots/types';
 
 describe('Lots', () => {
   let app: INestApplication;
@@ -206,6 +208,111 @@ describe('Lots', () => {
             expect.objectContaining({ address: testSet[1] }),
           );
         });
+    });
+
+    describe('when the bounds parameter is provided', () => {
+      it('limits results to bounds', async () => {
+        const credentials = await generateCredentials();
+        const testBounds: Bounds = {
+          southWest: { latitude: 50, longitude: 50 },
+          northEast: { latitude: 60, longitude: 60 },
+        };
+
+        const lotsInBoundsCount = 10;
+
+        const lotsInBoundsIds = await Promise.all(
+          Array.from({ length: lotsInBoundsCount }).map(async (_, index) => {
+            const result = await createLot(app, credentials, {
+              name: `Lot in Bounds #${index}`,
+              address: `Address ${index}`,
+              spotsCount: 1,
+              location: {
+                latitude: testBounds.southWest.latitude + Math.random() * 10,
+                longitude: testBounds.southWest.longitude + Math.random() * 10,
+              },
+            });
+
+            return result.body.id as number;
+          }),
+        );
+
+        const lotsOutOfBoundsIds = await Promise.all(
+          Array.from({ length: lotsInBoundsCount }).map(async (_, index) => {
+            const result = await createLot(app, credentials, {
+              name: `Lot in Bounds #${index}`,
+              address: `Address ${index}`,
+              spotsCount: 1,
+              location: {
+                latitude:
+                  testBounds.northEast.latitude +
+                  10 +
+                  Math.floor(Math.random() * 10),
+                longitude:
+                  testBounds.northEast.longitude +
+                  10 +
+                  Math.floor(Math.random() * 10),
+              },
+            });
+
+            return result.body.id as number;
+          }),
+        );
+
+        const queryString = stringify(
+          { bounds: testBounds },
+          { encode: false },
+        );
+
+        const response = await request(app.getHttpServer())
+          .get(`/lots?${queryString}`)
+          .expect(200);
+
+        lotsInBoundsIds.forEach((id) => {
+          expect(response.body).toContainEqual(expect.objectContaining({ id }));
+        });
+
+        lotsOutOfBoundsIds.forEach((id) => {
+          expect(response.body).not.toContainEqual(
+            expect.objectContaining({ id }),
+          );
+        });
+      });
+    });
+
+    describe('when the with_availability parameter is provided', () => {
+      it('includes an `availableSpots` field on each lot', async () => {
+        const credentials = await generateCredentials();
+        const testBounds: Bounds = {
+          southWest: { latitude: 50, longitude: 50 },
+          northEast: { latitude: 60, longitude: 60 },
+        };
+
+        const lotsInBoundsCount = 10;
+
+        await Promise.all(
+          Array.from({ length: lotsInBoundsCount }).map(async (_, index) => {
+            const result = await createLot(app, credentials, {
+              name: `Lot in Bounds #${index}`,
+              address: `Address ${index}`,
+              spotsCount: 1,
+              location: {
+                latitude: testBounds.southWest.latitude + Math.random() * 10,
+                longitude: testBounds.southWest.longitude + Math.random() * 10,
+              },
+            });
+
+            return result.body.id as number;
+          }),
+        );
+
+        const response = await request(app.getHttpServer())
+          .get(`/lots?with_availability=1`)
+          .expect(200);
+
+        (response.body as Array<{ availability: number }>).forEach((lot) => {
+          expect(lot.availability).toBe('1');
+        });
+      });
     });
   });
 
