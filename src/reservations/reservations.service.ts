@@ -44,7 +44,7 @@ export class ReservationsService {
     return null;
   }
 
-  async createReservationIfSpotsAvailable({
+  async tryCreateReservation({
     userId,
     lotId,
   }: {
@@ -55,6 +55,12 @@ export class ReservationsService {
 
     if (!spot) {
       throw new Error('No spots available');
+    }
+
+    const currentReservation = await this.getUserCurrentReservation(userId);
+
+    if (currentReservation) {
+      throw new Error('User already has active reservation');
     }
 
     // @ts-expect-error -- drizzle orm type inference sucks

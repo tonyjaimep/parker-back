@@ -144,6 +144,27 @@ describe('Reservations', () => {
         .send({ lotId: testLot.id })
         .expect(401);
     });
+
+    it('fails if user already has an active reservation', async () => {
+      await db
+        .insert(reservation)
+        // @ts-expect-error -- damn drizzle orm
+        .values({
+          spotId: testSpot.id,
+          userId: credentials.user.id,
+        })
+        .returning();
+
+      await request(app.getHttpServer())
+        .post('/reservations')
+        .auth(credentials.token, { type: 'bearer' })
+        .send({ lotId: testLot.id })
+        .expect(400);
+
+      const reservations = await db.query.reservation.findMany();
+
+      expect(reservations.length).toEqual(1);
+    });
   });
 
   describe('GET /reservations/current', () => {

@@ -32,13 +32,17 @@ export class ReservationsController {
     }
 
     try {
-      return await this.reservationsService.createReservationIfSpotsAvailable({
+      return await this.reservationsService.tryCreateReservation({
         ...createReservationRequestDto,
         userId: user.id,
       });
     } catch (error) {
-      if (error.message === 'No spots available') {
-        throw new BadRequestException();
+      if (
+        ['No spots available', 'User already has active reservation'].includes(
+          error.message,
+        )
+      ) {
+        throw new BadRequestException({ message: error.message });
       }
       throw error;
     }
