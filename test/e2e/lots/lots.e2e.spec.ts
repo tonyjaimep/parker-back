@@ -85,6 +85,10 @@ describe('Lots', () => {
           expect(response.body).toMatchObject({
             name: 'Example Lot',
             address: 'Address #123',
+            location: {
+              latitude: 123.456,
+              longitude: 23.456,
+            },
           });
         });
     });
@@ -109,6 +113,10 @@ describe('Lots', () => {
           expect(response.body).toMatchObject({
             name: 'Example Lot',
             address: 'Address #123',
+            location: {
+              latitude: 123.456,
+              longitude: 23.456,
+            },
           });
         });
 

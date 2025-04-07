@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DbService } from '../db/db.service';
-import { Bounds, LotEditableFields } from './types';
+import { Bounds, LotEditableFields, LotSelect } from './types';
 import { lot } from 'src/db/schema/lot';
 import { and, eq, gte, lte, sql } from 'drizzle-orm';
 import { lotsToUsers } from 'src/db/schema/lot-to-users';
@@ -39,7 +39,7 @@ export class LotsService {
         })),
       );
 
-      return createdLot;
+      return this.serializeLot(createdLot);
     });
   }
 
@@ -64,7 +64,10 @@ export class LotsService {
       .where(eq(lot.id, lotId))
       .returning();
 
-    return updatedLots[0];
+    return this.serializeLot(
+      // @ts-ignore -- drizzle error. can't expect-error because it's transitory
+      updatedLots[0],
+    );
   }
 
   async getLots(config: { withAvailability?: boolean; bounds?: Bounds }) {
@@ -89,7 +92,7 @@ export class LotsService {
       );
 
     if (config.withAvailability) {
-      return query
+      const result = await query
         .leftJoin(spot, eq(lot.id, spot.lotId))
         .leftJoin(
           reservation,
@@ -100,12 +103,26 @@ export class LotsService {
           ),
         )
         .groupBy(lot.id);
+
+      return result.map(this.serializeLot);
     }
 
-    return query;
+    const result = await query;
+
+    return result.map(this.serializeLot);
   }
 
   async deleteLot(lotId: number) {
     return this.dbService.db.delete(lot).where(eq(lot.id, lotId));
+  }
+
+  serializeLot(lot: LotSelect) {
+    return {
+      ...lot,
+      location: {
+        latitude: lot.location?.y,
+        longitude: lot.location?.x,
+      },
+    };
   }
 }
