@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DrizzlePGModule } from '@knaadh/nestjs-drizzle-pg';
 import { DB_TAG } from './db/constants';
 import { LotsModule } from './lots/lots.module';
+import { ReservationsModule } from './reservations/reservations.module';
 import schema from './db/schema';
 
 @Module({
@@ -33,6 +34,7 @@ import schema from './db/schema';
     UsersModule,
     FirebaseModule,
     LotsModule,
+    ReservationsModule,
   ],
   controllers: [],
   providers: [],

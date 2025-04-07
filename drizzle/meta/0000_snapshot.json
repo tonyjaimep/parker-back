@@ -1,5 +1,5 @@
 {
-  "id": "09d5d4ff-343a-4055-b397-f7439c689abe",
+  "id": "52a86d31-5280-4ac3-bc6d-7fda5ad36299",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -30,10 +30,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "lots_to_users_user_id_user_id_fk": {
-          "name": "lots_to_users_user_id_user_id_fk",
+        "lots_to_users_user_id_users_id_fk": {
+          "name": "lots_to_users_user_id_users_id_fk",
           "tableFrom": "lots_to_users",
-          "tableTo": "user",
+          "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
@@ -249,10 +249,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "reservations_user_id_user_id_fk": {
-          "name": "reservations_user_id_user_id_fk",
+        "reservations_user_id_users_id_fk": {
+          "name": "reservations_user_id_users_id_fk",
           "tableFrom": "reservations",
-          "tableTo": "user",
+          "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
@@ -374,8 +374,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.user": {
-      "name": "user",
+    "public.users": {
+      "name": "users",
       "schema": "",
       "columns": {
         "id": {
@@ -421,8 +421,8 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "user_firebaseUserId_unique": {
-          "name": "user_firebaseUserId_unique",
+        "users_firebaseUserId_unique": {
+          "name": "users_firebaseUserId_unique",
           "nullsNotDistinct": false,
           "columns": [
             "firebase_user_id"

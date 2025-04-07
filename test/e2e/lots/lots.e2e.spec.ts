@@ -12,7 +12,7 @@ import { eq } from 'drizzle-orm';
 import { lot } from 'src/db/schema/lot';
 import { createLot } from './utils';
 import { stringify } from 'qs';
-import { Bounds, LotSelect } from 'src/lots/types';
+import { Bounds } from 'src/lots/types';
 
 describe('Lots', () => {
   let app: INestApplication;

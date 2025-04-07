@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { DbService } from '../db/db.service';
-import { Bounds, Coordinates, LotEditableFields } from './types';
+import { Bounds, LotEditableFields } from './types';
 import { lot } from 'src/db/schema/lot';
 import { and, eq, gte, lte, sql } from 'drizzle-orm';
 import { lotsToUsers } from 'src/db/schema/lot-to-users';
 import { spot } from 'src/db/schema/spot';
 import { reservation } from 'src/db/schema/reservation';
-import { PgSelect } from 'drizzle-orm/pg-core';
 
 @Injectable()
 export class LotsService {

@@ -17,9 +17,7 @@ export const spot = pgTable('spots', {
   priceId: integer().references(() => price.id, { onDelete: 'set null' }),
   isAvailable: boolean().default(true),
   createdAt: timestamp().defaultNow(),
-  updatedAt: timestamp()
-    .defaultNow()
-    .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp().defaultNow(),
 });
 
 export const spotRelations = relations(spot, ({ one }) => ({
