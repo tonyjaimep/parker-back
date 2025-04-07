@@ -36,3 +36,6 @@ start:
 
 logs:
 	docker compose logs server -f
+
+seed-dev: db-migrate
+	docker compose exec server npm run db:seed-dev

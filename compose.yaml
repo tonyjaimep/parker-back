@@ -17,7 +17,9 @@ services:
       db:
         condition: service_healthy
   db:
-    image: postgres
+    build:
+      context: .
+      dockerfile: ./db.Dockerfile
     restart: always
     user: postgres
     volumes:

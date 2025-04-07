@@ -18,7 +18,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/e2e/jest-e2e.json",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed-dev": "ts-node ./src/db/seeds/dev.seed.ts"
   },
   "dependencies": {
     "@knaadh/nestjs-drizzle-pg": "^1.2.0",
@@ -41,6 +42,7 @@
     "rxjs": "^7.8.2"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.6.0",
     "@nestjs/cli": "^11.0.6",
     "@nestjs/schematics": "^11.0.3",
     "@nestjs/testing": "^11.0.13",
