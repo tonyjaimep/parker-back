@@ -11,6 +11,7 @@ import { MetricsModule } from './metrics/metrics.module';
 import schema from './db/schema';
 import { MetricsInterceptor } from './metrics/metrics.interceptor';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     LotsModule,
     ReservationsModule,
     MetricsModule,
+    HealthModule,
   ],
   controllers: [],
   providers: [
