@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.36.0 (HEAD)
+  labels:
+    io.kompose.service: server
+  name: server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: server
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.36.0 (HEAD)
+      labels:
+        io.kompose.service: server
+    spec:
+      containers:
+        - command:
+            - sh
+            - /usr/src/app/entrypoint.sh
+          env:
+            - name: DB_URL
+              value: postgresql://parker:parkerdbpassword@db:5432/parkerdb?schema=public&connection_limit=20
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /usr/src/app/src/firebase/credentials/service-account-file.json
+            - name: NODE_ENV
+              value: development
+          image: server
+          name: server
+          ports:
+            - containerPort: 3000
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /usr/src/app/src
+              name: server-cm0
+            - mountPath: /usr/src/app/entrypoint.sh
+              name: server-cm1
+              subPath: entrypoint.sh
+            - mountPath: /usr/src/app/drizzle
+              name: server-cm2
+      restartPolicy: Always
+      volumes:
+        - configMap:
+            name: server-cm0
+          name: server-cm0
+        - configMap:
+            items:
+              - key: entrypoint.sh
+                path: entrypoint.sh
+            name: server-cm1
+          name: server-cm1
+        - configMap:
+            name: server-cm2
+          name: server-cm2
