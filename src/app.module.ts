@@ -7,10 +7,7 @@ import { DrizzlePGModule } from '@knaadh/nestjs-drizzle-pg';
 import { DB_TAG } from './db/constants';
 import { LotsModule } from './lots/lots.module';
 import { ReservationsModule } from './reservations/reservations.module';
-import { MetricsModule } from './metrics/metrics.module';
 import schema from './db/schema';
-import { MetricsInterceptor } from './metrics/metrics.interceptor';
-import { APP_INTERCEPTOR } from '@nestjs/core';
 import { HealthModule } from './health/health.module';
 
 @Module({
@@ -39,15 +36,9 @@ import { HealthModule } from './health/health.module';
     FirebaseModule,
     LotsModule,
     ReservationsModule,
-    MetricsModule,
     HealthModule,
   ],
   controllers: [],
-  providers: [
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: MetricsInterceptor,
-    },
-  ],
+  providers: [],
 })
 export class AppModule {}

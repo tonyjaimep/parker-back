@@ -51,3 +51,9 @@ deploy-local: build
 	minikube image load parker-back-server:latest
 	minikube image load parker-back-db:latest
 	kubectl apply -f deploy
+
+local-service-mesh: build
+	minikube start
+	minikube image load parker-back-server:latest
+	minikube image load parker-back-db:latest
+	./istio-setup.sh

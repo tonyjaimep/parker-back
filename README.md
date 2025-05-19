@@ -38,16 +38,6 @@ make seed-dev
 make test-e2e
 ```
 
-## Service management
-
-A Grafana and a Prometheus instance are configured to monitor the application.
-To access them, run:
-```
-make up
-```
-
-Then navigate to `localhost:3030` for Grafana and `localhost:9090` for Prometheus.
-
 ## Local Deployment
 
 ```
@@ -56,3 +46,16 @@ make deploy-local
 
 This will build Docker images of the server and the database, and deploy them
 to a local Kubernetes cluster using Minikube.
+
+### Service Mesh
+
+This command will install `istio` in the current directory, deploy to the
+minikube cluster, and configure the application to use Istio for service mesh
+capabilities.
+
+```
+make local-service-mesh
+```
+
+At the end of the command, the output will give the commands to run Grafana and
+Kiali, which are the observability tools for Istio.
