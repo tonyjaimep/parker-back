@@ -32,6 +32,7 @@ ENV PATH=/usr/src/app/node_modules/.bin:$PATH
 
 # Copy built source code
 COPY ./dist ./dist
+COPY ./drizzle ./drizzle
 COPY ./entrypoint.sh .
 COPY ./drizzle.config.ts .
 
