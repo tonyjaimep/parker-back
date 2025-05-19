@@ -1,22 +1,42 @@
 # Development stage
-FROM node:20-alpine
+FROM node:23-alpine AS development
 
-# Set working directory
 WORKDIR /usr/src/app
 
-# Add package management files
-COPY package*.json ./
-
-# Install dependencies with package lock for consistency
-RUN npm ci
-
-# Add node_modules/.bin to PATH
-ENV PATH /usr/src/app/node_modules/.bin:$PATH
-
-# Copy source code
 COPY . .
 
-# Expose development port
+COPY package*.json ./
+
+# Install all dependencies (including devDependencies)
+RUN npm install
+
+ENV PATH=/usr/src/app/node_modules/.bin:$PATH
+
 EXPOSE 3000
+
+ENV NODE_ENV=development
+
+CMD ["sh", "./entrypoint.sh"]
+
+# Production stage
+FROM node:23-alpine AS production
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+# Install only production dependencies
+RUN npm ci --production
+
+ENV PATH=/usr/src/app/node_modules/.bin:$PATH
+
+# Copy built source code
+COPY ./dist ./dist
+COPY ./entrypoint.sh .
+COPY ./drizzle.config.ts .
+
+EXPOSE 3000
+
+ENV NODE_ENV=production
 
 CMD ["sh", "./entrypoint.sh"]

@@ -31,32 +31,10 @@ spec:
               value: postgresql://parker:parkerdbpassword@db:5432/parkerdb?schema=public&connection_limit=20
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: /usr/src/app/src/firebase/credentials/service-account-file.json
-            - name: NODE_ENV
-              value: development
-          image: server
+          image: library/parker-back-server
+          imagePullPolicy: IfNotPresent
           name: server
           ports:
             - containerPort: 3000
               protocol: TCP
-          volumeMounts:
-            - mountPath: /usr/src/app/src
-              name: server-cm0
-            - mountPath: /usr/src/app/entrypoint.sh
-              name: server-cm1
-              subPath: entrypoint.sh
-            - mountPath: /usr/src/app/drizzle
-              name: server-cm2
       restartPolicy: Always
-      volumes:
-        - configMap:
-            name: server-cm0
-          name: server-cm0
-        - configMap:
-            items:
-              - key: entrypoint.sh
-                path: entrypoint.sh
-            name: server-cm1
-          name: server-cm1
-        - configMap:
-            name: server-cm2
-          name: server-cm2

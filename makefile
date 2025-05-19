@@ -39,3 +39,15 @@ logs:
 
 seed-dev: db-migrate
 	docker compose exec server npm run db:seed-dev
+
+build:
+	npm run build
+	docker build -t parker-back-server:latest .
+	docker build -t parker-back-db:latest -f ./db.Dockerfile .
+
+deploy-local: build
+	eval $(minikube -p minikube docker-env)
+	minikube start
+	minikube image load parker-back-server:latest
+	minikube image load parker-back-db:latest
+	kubectl apply -f deploy

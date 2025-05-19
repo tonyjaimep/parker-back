@@ -32,7 +32,8 @@ spec:
               value: parkerdbpassword
             - name: POSTGRES_USER
               value: parker
-          image: db
+          image: library/parker-back-db
+          imagePullPolicy: IfNotPresent
           livenessProbe:
             exec:
               command:
