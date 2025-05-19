@@ -5,7 +5,7 @@ set -e
 
 # Variables
 ISTIO_VERSION="latest"
-YAML_FOLDER="./deploy"
+YAML_FOLDER="./k8s/deploy"
 NAMESPACE="default"
 
 # Step 1: Start Minikube with sufficient resources

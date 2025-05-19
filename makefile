@@ -1,3 +1,6 @@
+.PHONY: up down stop start logs seed-dev build deploy-local local-service-mesh db-generate db-migrate db-reset build-e2e start-e2e test-e2e kill-e2e
+NAME ?= init
+
 db-generate: start
 	docker compose exec server drizzle-kit generate --name $(NAME)
 
@@ -50,10 +53,13 @@ deploy-local: build
 	minikube start
 	minikube image load parker-back-server:latest
 	minikube image load parker-back-db:latest
-	kubectl apply -f deploy
+	kubectl apply -f k8s/deploy
 
 local-service-mesh: build
 	minikube start
 	minikube image load parker-back-server:latest
 	minikube image load parker-back-db:latest
 	./istio-setup.sh
+
+minikube-migrate-db:
+	kubectl apply -f k8s/jobs/db-migration-job.yaml
