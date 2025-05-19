@@ -2,8 +2,18 @@
 
 This is a NestJS monolith application that acts as the backend for Parker, a parking lot management app.
 
+
 ## Local Development
 
+### Dependencies
+
+- Node 23
+- Docker compose (Development)
+- Minikube (Development)
+
+### IDE Setup
+
+Run `npm install` to install the javascript dependencies.
 
 ### Run the server with Docker
 
@@ -37,3 +47,12 @@ make up
 ```
 
 Then navigate to `localhost:3030` for Grafana and `localhost:9090` for Prometheus.
+
+## Local Deployment
+
+```
+make deploy-local
+```
+
+This will build Docker images of the server and the database, and deploy them
+to a local Kubernetes cluster using Minikube.
