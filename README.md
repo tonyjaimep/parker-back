@@ -59,3 +59,9 @@ make local-service-mesh
 
 At the end of the command, the output will give the commands to run Grafana and
 Kiali, which are the observability tools for Istio.
+
+#### Grafana
+![image](https://github.com/user-attachments/assets/7c415dd2-db0a-4f38-a4e8-68a7894b939d)
+
+#### Kiali
+![image](https://github.com/user-attachments/assets/fe512832-a051-401c-8fca-3a6db349dac2)
