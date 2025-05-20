@@ -25,17 +25,14 @@ test-e2e: start-e2e
 kill-e2e:
 	docker compose -f test/e2e/compose.yaml down
 
-up:
-	docker compose up -d --build
-
 down:
 	docker compose down
 
 stop:
 	docker compose stop
 
-start:
-	docker compose start
+up:
+	docker compose -f lots-service/compose.yml -f identity-service/compose.yml up -d --build
 
 logs:
 	docker compose logs server -f

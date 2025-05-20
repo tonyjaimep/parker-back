@@ -1,0 +1,17 @@
+services:
+  app-service:
+    build:
+      context: .
+      target: development
+    environment:
+      NODE_ENV: development
+      IDENTITY_SERVICE_HOST: identity-service
+      IDENTITY_SERVICE_PORT: 3000
+      LOTS_SERVICE_HOST: lots-service
+      LOTS_SERVICE_PORT: 3000
+      RESERVATIONS_SERVICE_HOST: lots-service
+      RESERVATIONS_SERVICE_PORT: 3000
+    ports:
+      - ${APP_SERVICE_PORT-3000}:3000
+    volumes:
+      - ./src:/usr/src/app/src
