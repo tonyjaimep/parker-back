@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lots-db
+  labels:
+    app: lots-db
+spec:
+  selector:
+    matchLabels:
+      app: lots-db
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: lots-db
+    spec:
+      containers:
+        - name: lots-db
+          image: postgres:17
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POSTGRES_DB
+              value: lotsservicedb
+            - name: POSTGRES_USER
+              value: lotsservice
+            - name: POSTGRES_PASSWORD
+              value: lotsservicedbpassword
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: lots-db-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: lots-db-storage
+          persistentVolumeClaim:
+            claimName: lots-db-pvc
+      restartPolicy: Always

@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reservations-db
+  labels:
+    app: reservations-db
+spec:
+  selector:
+    matchLabels:
+      app: reservations-db
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: reservations-db
+    spec:
+      containers:
+        - name: reservations-db
+          image: postgres:17
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: POSTGRES_DB
+              value: reservationsservicedb
+            - name: POSTGRES_USER
+              value: reservationsservice
+            - name: POSTGRES_PASSWORD
+              value: reservationsservicedbpassword
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: reservations-db-storage
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: reservations-db-storage
+          persistentVolumeClaim:
+            claimName: reservations-db-pvc
+      restartPolicy: Always

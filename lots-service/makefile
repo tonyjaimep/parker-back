@@ -8,6 +8,7 @@ start:
 	docker compose up -d --build
 
 build:
+	npm run build
 	docker build -t josejaime5271/parker-lots-service:latest --target=production .
 
 push:

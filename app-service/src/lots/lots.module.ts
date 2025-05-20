@@ -22,6 +22,7 @@ import { ConfigService } from '@nestjs/config';
     ]),
   ],
   providers: [LotsService],
+  exports: [LotsService],
   controllers: [LotsController],
 })
 export class LotsModule {}
