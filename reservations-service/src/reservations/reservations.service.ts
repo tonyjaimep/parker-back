@@ -11,18 +11,21 @@ export class ReservationsService {
   async createReservation(
     userId: number,
     spotId: number,
-  ): Promise<ReservationsService> {
+  ): Promise<ReservationSelect> {
     const currentReservation = await this.getUserCurrentReservation(userId);
 
     if (currentReservation) {
       throw new Error('User already has active reservation');
     }
 
-    // @ts-expect-error -- drizzle orm type inference sucks
-    return this.dbService.db.insert(reservation).values({
-      spotId,
-      userId,
-    });
+    const insertedReservations = await this.dbService.db
+      .insert(reservation)
+      .values({
+        spotId,
+        userId,
+      });
+
+    return insertedReservations[0];
   }
 
   async getUserCurrentReservation(
