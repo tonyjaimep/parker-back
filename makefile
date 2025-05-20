@@ -15,9 +15,10 @@ migrate-dbs:
 	docker compose exec lots-service npm run db:push
 	docker compose exec reservations-service npm run db:push
 
-deploy-local: build
+deploy-local:
 	eval $(minikube -p minikube docker-env)
 	minikube start
+	kubectl create configmap firebase-config --from-file=./identity-service/src/firebase/credentials/service-account-file.json
 	kubectl apply -f k8s/deploy
 
 migrate-k8s-dbs:
@@ -27,4 +28,5 @@ migrate-k8s-dbs:
 
 local-service-mesh:
 	minikube start
+	kubectl create configmap firebase-config --from-file=./identity-service/src/firebase/credentials/service-account-file.json
 	./istio-setup.sh

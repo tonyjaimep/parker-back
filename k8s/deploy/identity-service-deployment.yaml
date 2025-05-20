@@ -19,7 +19,20 @@ spec:
           env:
             - name: DB_URL
               value: postgresql://identityservice:identityservicedbpassword@identity-db:5432/identityservicedb?SCHEMA=public&connection_limit=20
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: '/usr/src/app/config/service-account-file.json'
           image: josejaime5271/parker-identity-service
           ports:
             - containerPort: 3000
               protocol: TCP
+          volumeMounts:
+            - name: firebase-config-volume
+              mountPath: '/usr/src/app/config'
+              readOnly: true
+      volumes:
+        - name: firebase-config-volume
+          configMap:
+            name: firebase-config
+            items:
+              - key: service-account-file.json
+                path: service-account-file.json
