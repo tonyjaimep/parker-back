@@ -3,7 +3,7 @@ import { ReservationsService } from './reservations.service';
 import { CreateReservationRequestDto } from './dto/create-reservation.dto';
 import { MessagePattern } from '@nestjs/microservices';
 
-@Controller('reservations')
+@Controller()
 export class ReservationsController {
   constructor(private readonly reservationsService: ReservationsService) {}
 
@@ -12,14 +12,17 @@ export class ReservationsController {
     createReservationRequestDto: CreateReservationRequestDto,
   ) {
     try {
-      return await this.reservationsService.createReservation(
+      const response = await this.reservationsService.createReservation(
         createReservationRequestDto.userId,
         createReservationRequestDto.spotId,
       );
+
+      return response;
     } catch (error) {
       if (error.message == 'User already has active reservation') {
         throw new BadRequestException({ message: error.message });
       }
+
       throw error;
     }
   }
