@@ -1,7 +1,6 @@
-import { Controller, Query, ValidationPipe } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { LotsService } from './lots.service';
 import { GetLotsQueryDto, LotEditableFields } from './types';
-import { ParseNestedObjectPipe } from 'src/utils/pipes/parse-nested-object.pipe';
 import { MessagePattern } from '@nestjs/microservices';
 
 @Controller()
@@ -10,12 +9,11 @@ export class LotsController {
 
   @MessagePattern('get_lots')
   async getLots(
-    @Query(ParseNestedObjectPipe, new ValidationPipe({ transform: true }))
-    query: GetLotsQueryDto,
+    config: GetLotsQueryDto,
   ) {
     return this.lotsService.getLots({
-      withAvailability: query.with_availability,
-      bounds: query.bounds,
+      withAvailability: config.with_availability,
+      bounds: config.bounds,
     });
   }
 
