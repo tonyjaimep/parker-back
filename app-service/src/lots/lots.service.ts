@@ -10,13 +10,13 @@ export class LotsService {
 
   async createLot(
     creatorId: number,
-    lotData: LotEditableFields,
+    data: LotEditableFields,
     spotsCount: number,
   ) {
     return firstValueFrom(
-      this.lotsClient.send('create-lot', {
+      this.lotsClient.send('create_lot', {
         creatorId,
-        lotData,
+        data,
         spotsCount,
       }),
     );
@@ -24,21 +24,37 @@ export class LotsService {
 
   async isLotOwner(lotId: number, userId: number) {
     return firstValueFrom(
-      this.lotsClient.send('get-is-lot-owner', { lotId, userId }),
+      this.lotsClient.send('get_is_lot_owner', { id: lotId, userId }),
     );
   }
 
   async updateLot(lotId: number, updatedData: Partial<LotEditableFields>) {
     return firstValueFrom(
-      this.lotsClient.send('get-is-lot-owner', { lotId, data: updatedData }),
+      this.lotsClient.send('update_lot', { lotId, data: updatedData }),
     );
   }
 
   async getLots(config: { withAvailability?: boolean; bounds?: Bounds }) {
-    return firstValueFrom(this.lotsClient.send('get-lots', config));
+    return firstValueFrom(this.lotsClient.send('get_lots', config));
   }
 
   async deleteLot(lotId: number) {
-    return firstValueFrom(this.lotsClient.send('delete-lot', lotId));
+    return firstValueFrom(this.lotsClient.send('delete_lot', lotId));
+  }
+
+  async doesLotExist(lotId: number) {
+    return firstValueFrom(this.lotsClient.send('does_lot_exist', lotId));
+  }
+
+  async findAvailableSpotId(
+    lotId: number,
+    time: Date = new Date(),
+  ): Promise<number | null> {
+    return firstValueFrom(
+      this.lotsClient.send<number | null>('get_available_spot_id', {
+        lotId,
+        time,
+      }),
+    );
   }
 }

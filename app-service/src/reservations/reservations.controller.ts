@@ -1,58 +1,46 @@
-/*
 import {
   BadRequestException,
   Body,
   Controller,
   Get,
-  NotFoundException,
   Post,
 } from '@nestjs/common';
-import { UseAuth } from 'src/auth/decorators/use-auth.decorator';
+import { UserPayload } from 'src/constants/types';
+import { UseAuth } from 'src/identity/decorators/use-auth.decorator';
+import { User } from 'src/identity/decorators/user.decorator';
 import { ReservationsService } from './reservations.service';
 import { CreateReservationRequestDto } from './dto/create-reservation.dto';
-import { User } from 'src/auth/decorators/user.decorator';
-import { UserSelect } from 'src/users/types';
+import { LotsService } from 'src/lots/lots.service';
 
 @Controller('reservations')
 export class ReservationsController {
-  constructor(private readonly reservationsService: ReservationsService) {}
+  constructor(
+    private readonly reservationsService: ReservationsService,
+    private readonly lotsService: LotsService,
+  ) {}
 
   @Post('/')
   @UseAuth()
   async createReservation(
-    @User() user: UserSelect,
+    @User() user: UserPayload,
     @Body() createReservationRequestDto: CreateReservationRequestDto,
   ) {
-    // 404 case:
-    const lotExists = await this.reservationsService.doesLotExist(
+    const availableSpotId = await this.lotsService.findAvailableSpotId(
       createReservationRequestDto.lotId,
     );
 
-    if (!lotExists) {
-      throw new NotFoundException();
+    if (!availableSpotId) {
+      throw new BadRequestException({
+        message: 'No spots available in this lot',
+      });
     }
 
-    try {
-      return await this.reservationsService.tryCreateReservation({
-        ...createReservationRequestDto,
-        userId: user.id,
-      });
-    } catch (error) {
-      if (
-        ['No spots available', 'User already has active reservation'].includes(
-          error.message,
-        )
-      ) {
-        throw new BadRequestException({ message: error.message });
-      }
-      throw error;
-    }
+    return this.reservationsService.createReservation(user.id, availableSpotId);
   }
 
   @Get('current')
   @UseAuth()
-  async getCurrentReservation(@User() user: UserSelect) {
+  async getCurrentReservation(@User() user: UserPayload) {
     return this.reservationsService.getUserCurrentReservation(user.id);
   }
 }
-*/

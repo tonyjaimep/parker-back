@@ -1,11 +1,15 @@
-/*
-import { reservation } from 'src/db/schema/reservation';
-
 export type ReservationInsert = {
   userId: number;
   spotId: number;
   priceId?: number;
 };
 
-export type ReservationSelect = typeof reservation.$inferSelect;
-*/
+export type ReservationPayload = {
+  id: number;
+  userId: number;
+  spotId: number;
+  createdAt: string;
+  updatedAt: string;
+  startsAt: string;
+  endsAt: string;
+};

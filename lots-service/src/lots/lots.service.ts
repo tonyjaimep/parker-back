@@ -1,16 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { /* Inject, */ Injectable } from '@nestjs/common';
 import { DbService } from '../db/db.service';
 import { Bounds, LotEditableFields, LotSelect } from './types';
 import { lot } from 'src/db/schema/lot';
-import { and, eq, gte, lte, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { spot } from 'src/db/schema/spot';
-import { RESERVATIONS_SERVICE } from 'src/constants/services';
-import { ClientProxy } from '@nestjs/microservices';
+// import { RESERVATIONS_SERVICE } from 'src/constants/services';
+// import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class LotsService {
   constructor(
     private dbService: DbService,
+    // @Inject(RESERVATIONS_SERVICE) reservationsService: ClientProxy
   ) {}
 
   async createLot(
@@ -114,5 +115,23 @@ export class LotsService {
         longitude: lot.location?.x,
       },
     };
+  }
+
+  async findAvailableSpot(
+    lotId: number,
+    // time: Date = new Date(),
+  ): Promise<Pick<typeof spot.$inferSelect, 'id'> | null> {
+    const result = await this.dbService.db
+      .select({ id: spot.id })
+      .from(spot)
+      .where(and(eq(spot.lotId, lotId), eq(spot.isAvailable, true)))
+      .orderBy(spot.id)
+      .limit(1);
+
+    if (result.length > 0) {
+      return result[0];
+    }
+
+    return null;
   }
 }

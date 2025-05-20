@@ -1,10 +1,32 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { ReservationsModule } from './reservations/reservations.module';
+import { DrizzlePGModule } from '@knaadh/nestjs-drizzle-pg';
+import schema from './db/schema';
+import { DB_TAG } from './db/constants';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    DrizzlePGModule.registerAsync({
+      tag: DB_TAG,
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        pg: {
+          connection: 'client',
+          config: {
+            connectionString: configService.getOrThrow('DB_URL'),
+          },
+        },
+        config: {
+          dialect: 'postgresql',
+          casing: 'snake_case',
+          schema: { ...schema },
+        },
+      }),
+    }),
+    ReservationsModule,
+  ],
 })
 export class AppModule {}
