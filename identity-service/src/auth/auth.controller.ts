@@ -1,12 +1,13 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { MessagePattern } from '@nestjs/microservices';
 
-@Controller('auth')
+@Controller()
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get('email/check')
-  async checkEmailAvailability(@Query('email') email: string) {
+  @MessagePattern('get_is_email_available')
+  async checkEmailAvailability({ email }: { email: string }) {
     const isAvailable = await this.authService.isEmailAvailable(email);
 
     return { isAvailable };

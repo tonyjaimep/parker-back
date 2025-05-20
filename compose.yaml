@@ -1,42 +1,5 @@
-services:
-  server:
-    build:
-      context: .
-      target: development
-      dockerfile: Dockerfile
-    environment:
-      NODE_ENV: development
-      DB_URL: postgresql://${DB_USER-postgres}:${DB_PASSWORD}@${DB_HOST-db}:${DB_PORT-5432}/${DB_DATABASE}?schema=public&connection_limit=${DB_CONNECTION_LIMIT-20}
-      GOOGLE_APPLICATION_CREDENTIALS: '/usr/src/app/src/firebase/credentials/service-account-file.json'
-    volumes:
-      - ./src:/usr/src/app/src
-      - ./entrypoint.sh:/usr/src/app/entrypoint.sh
-      - ./drizzle:/usr/src/app/drizzle
-    entrypoint: ["sh", "/usr/src/app/entrypoint.sh"]
-    ports:
-      - 3000:3000
-    depends_on:
-      db:
-        condition: service_healthy
-  db:
-    build:
-      context: .
-      dockerfile: ./db.Dockerfile
-    restart: always
-    user: postgres
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    environment:
-      - PGUSER=${DB_USER-postgres}
-      - POSTGRES_USER=${DB_USER-postgres}
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_DATABASE}
-    ports:
-      - 5432:5432
-    healthcheck:
-      test: [ "CMD", "pg_isready" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-volumes:
-  db-data:
+include:
+  - path: identity-service/compose.yml
+  - path: lots-service/compose.yml
+  - path: app-service/compose.yml
+

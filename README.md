@@ -1,6 +1,6 @@
 # Parker Backend
 
-This is a NestJS monolith application that acts as the backend for Parker, a parking lot management app.
+This is a NestJS distributed application that acts as the backend for Parker, a parking lot management app.
 
 
 ## Local Development
