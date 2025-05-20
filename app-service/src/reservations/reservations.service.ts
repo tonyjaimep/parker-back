@@ -1,98 +1,31 @@
-/*
-import { Injectable } from '@nestjs/common';
-import { DbService } from 'src/db/db.service';
-import { reservation } from 'src/db/schema/reservation';
-import { spot } from 'src/db/schema/spot';
-import { and, eq, gt, gte, isNull, lte, or, sql } from 'drizzle-orm';
-import { ReservationInsert, ReservationSelect } from './types';
-import { lot } from 'src/db/schema/lot';
+import { Inject, Injectable } from '@nestjs/common';
+import { ClientProxy } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
+import { RESERVATIONS_SERVICE } from 'src/constants/services';
+import { ReservationPayload } from './types';
 
 @Injectable()
 export class ReservationsService {
-  constructor(private dbService: DbService) {}
+  constructor(
+    @Inject(RESERVATIONS_SERVICE)
+    private readonly reservationsClient: ClientProxy,
+  ) {}
 
-  async findAvailableSpot(
-    lotId: number,
-    time: Date = new Date(),
-  ): Promise<Pick<typeof spot.$inferSelect, 'id'> | null> {
-    const result = await this.dbService.db
-      .select({ id: spot.id })
-      .from(spot)
-      .leftJoin(
-        reservation,
-        and(
-          eq(spot.id, reservation.spotId),
-          or(
-            and(lte(reservation.startsAt, time), isNull(reservation.endsAt)),
-            and(lte(reservation.startsAt, time), gte(reservation.endsAt, time)),
-          ),
-        ),
-      )
-      .where(
-        and(
-          eq(spot.lotId, lotId),
-          eq(spot.isAvailable, true),
-          isNull(reservation.id),
-        ),
-      )
-      .orderBy(spot.id)
-      .limit(1);
-
-    if (result.length > 0) {
-      return result[0];
-    }
-
-    return null;
+  async createReservation(userId: number, spotId: number) {
+    return firstValueFrom(
+      this.reservationsClient.send<ReservationPayload | null>(
+        'create_reservation',
+        { userId, spotId },
+      ),
+    );
   }
 
-  async tryCreateReservation({
-    userId,
-    lotId,
-  }: {
-    userId: number;
-    lotId: number;
-  }) {
-    const spot = await this.findAvailableSpot(lotId);
-
-    if (!spot) {
-      throw new Error('No spots available');
-    }
-
-    const currentReservation = await this.getUserCurrentReservation(userId);
-
-    if (currentReservation) {
-      throw new Error('User already has active reservation');
-    }
-
-    // @ts-expect-error -- drizzle orm type inference sucks
-    return this.dbService.db.insert(reservation).values({
-      spotId: spot.id,
-      userId,
-    });
-  }
-
-  async doesLotExist(id: number) {
-    const result =
-      (await this.dbService.db.query.lot.findFirst({
-        where: eq(lot.id, id),
-        columns: { id: true },
-      })) ?? null;
-
-    return result !== null;
-  }
-
-  async getUserCurrentReservation(
-    userId: number,
-  ): Promise<ReservationSelect | null> {
-    const result =
-      (await this.dbService.db.query.reservation.findFirst({
-        where: and(
-          eq(reservation.userId, userId),
-          or(isNull(reservation.endsAt), gt(reservation.endsAt, sql`now()`)),
-        ),
-      })) ?? null;
-
-    return result;
+  async getUserCurrentReservation(userId: number) {
+    return firstValueFrom(
+      this.reservationsClient.send<ReservationPayload | null>(
+        'get_user_current_reservation',
+        { userId },
+      ),
+    );
   }
 }
-*/

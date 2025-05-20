@@ -1,5 +1,6 @@
 include:
   - path: identity-service/compose.yml
   - path: lots-service/compose.yml
+  - path: reservations-service/compose.yml
   - path: app-service/compose.yml
 

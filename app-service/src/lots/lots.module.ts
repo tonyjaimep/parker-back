@@ -17,6 +17,7 @@ import { ConfigService } from '@nestjs/config';
             port: configService.get('LOTS_SERVICE_PORT') || 3000,
           },
         }),
+        inject: [ConfigService],
       },
     ]),
   ],

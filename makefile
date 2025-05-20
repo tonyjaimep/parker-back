@@ -1,29 +1,8 @@
-.PHONY: up down stop start logs seed-dev build deploy-local local-service-mesh db-generate db-migrate db-reset build-e2e start-e2e test-e2e kill-e2e
-NAME ?= init
+up:
+	docker compose up -d --build
 
-db-generate: start
-	docker compose exec server drizzle-kit generate --name $(NAME)
-
-db-migrate: start
-	docker compose exec server drizzle-kit migrate
-
-db-reset: start
-	docker compose down db
-	docker volume rm parker-back_db-data
-	docker compose up db -d
-
-build-e2e:
-	docker compose -f test/e2e/compose.yaml up -d --build
-
-start-e2e:
-	docker compose -f test/e2e/compose.yaml up -d
-	docker compose --env-file test/e2e/test.env -f test/e2e/compose.yaml exec testdb npm run db:migrate
-
-test-e2e: start-e2e
-	docker compose --env-file test/e2e/test.env -f test/e2e/compose.yaml exec testdb npm run test:e2e -- --runInBand --detectOpenHandles --forceExit
-
-kill-e2e:
-	docker compose -f test/e2e/compose.yaml down
+start:
+	docker compose start
 
 down:
 	docker compose down
@@ -31,14 +10,13 @@ down:
 stop:
 	docker compose stop
 
-up:
-	docker compose -f lots-service/compose.yml -f identity-service/compose.yml up -d --build
+migrate-dbs:
+	docker compose exec identity-service npm run db:migrate
+	docker compose exec lots-service npm run db:migrate
+	docker compose exec reservations-service npm run db:migrate
 
 logs:
 	docker compose logs server -f
-
-seed-dev: db-migrate
-	docker compose exec server npm run db:seed-dev
 
 build:
 	npm run build

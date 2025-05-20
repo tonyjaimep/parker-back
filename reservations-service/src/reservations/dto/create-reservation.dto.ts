@@ -4,5 +4,9 @@ import { IsNumber } from 'class-validator';
 export class CreateReservationRequestDto {
   @IsNumber()
   @Type(() => Number)
-  lotId: number;
+  spotId: number;
+
+  @IsNumber()
+  @Type(() => Number)
+  userId: number;
 }

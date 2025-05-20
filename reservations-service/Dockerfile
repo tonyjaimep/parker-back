@@ -16,7 +16,10 @@ EXPOSE 3000
 
 ENV NODE_ENV=development
 
+
 CMD ["sh", "./entrypoint.sh"]
+
+#########################################
 
 # Production stage
 FROM node:23-alpine AS production
@@ -26,7 +29,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install only production dependencies
-RUN npm ci --production
+RUN npm ci --omit=dev
 
 ENV PATH=/usr/src/app/node_modules/.bin:$PATH
 
