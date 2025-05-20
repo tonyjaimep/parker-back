@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { DbService } from 'src/db/db.service';
 import { FirebaseService } from 'src/firebase/firebase.service';
-import { UserEditableFields, UserSelect } from './types';
+import { UserEditableFields } from './types';
 import { eq } from 'drizzle-orm';
 import { user } from 'src/db/schema/user';
 
@@ -12,7 +12,11 @@ export class UsersService {
     private readonly firebaseService: FirebaseService,
   ) {}
 
-  async isUserVerified(user: Pick<UserSelect, 'firebaseUserId'>) {
+  async isUserVerified(userId: number) {
+    const user = await this.getUserById(userId);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
     return await this.firebaseService.isUserVerified(user.firebaseUserId);
   }
 
@@ -34,6 +38,18 @@ export class UsersService {
     return this.dbService.db.query.user.findFirst({
       where: eq(user.firebaseUserId, firebaseUserId),
     });
+  }
+
+  async getUserFromFirebaseToken(token: string) {
+    const decodedToken = await this.firebaseService.decodeIdToken(token);
+
+    if (!decodedToken) {
+      return null;
+    }
+
+    const firebaseUserId = decodedToken.uid;
+
+    return this.getUserByFirebaseUserId(firebaseUserId);
   }
 
   async registerWithFirebaseToken(
