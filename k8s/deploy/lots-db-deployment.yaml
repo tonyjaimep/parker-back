@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: lots-db
-          image: postgres:17
+          image: 'josejaime5271/parker-lots-db'
           imagePullPolicy: IfNotPresent
           env:
             - name: POSTGRES_DB

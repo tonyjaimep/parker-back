@@ -33,9 +33,11 @@ RUN npm ci --omit=dev
 
 ENV PATH=/usr/src/app/node_modules/.bin:$PATH
 
-# Copy built source code
 COPY ./dist ./dist
 COPY ./entrypoint.sh .
+COPY ./drizzle.config.ts .
+COPY ./src/db/schema ./src/db/schema
+COPY ./drizzle ./drizzle
 
 EXPOSE 3000
 

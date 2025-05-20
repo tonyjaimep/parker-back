@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate-lots-db
+  namespace: default
+  labels:
+    app: migrate-lots-db
+spec:
+  ttlSecondsAfterFinished: 300 
+  completions: 1
+  template:
+    metadata:
+      name: migrate-lots-db
+      labels:
+        app: migrate-lots-db
+    spec:
+      containers:
+      - name: migration
+        image: josejaime5271/parker-lots-service
+        imagePullPolicy: Always
+        command: ['npm', 'run', 'db:migrate']
+        env:
+          - name: DB_URL
+            value: postgresql://lotsservice:lotsservicedbpassword@lots-db:5432/lotsservicedb?SCHEMA=public&connection_limit=20
+      restartPolicy: OnFailure
+      dnsPolicy: ClusterFirst

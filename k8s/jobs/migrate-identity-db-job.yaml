@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate-identity-db
+  namespace: default
+  labels:
+    app: migrate-identity-db
+spec:
+  ttlSecondsAfterFinished: 300 
+  completions: 1
+  template:
+    metadata:
+      name: migrate-identity-db
+      labels:
+        app: migrate-identity-db
+    spec:
+      containers:
+      - name: migration
+        image: josejaime5271/parker-identity-service
+        imagePullPolicy: IfNotPresent
+        command: ['npm', 'run', 'db:push']
+        env:
+          - name: DB_URL
+            value: postgresql://identityservice:identityservicedbpassword@identity-db:5432/identityservicedb?SCHEMA=public&connection_limit=20
+      restartPolicy: OnFailure
+      dnsPolicy: ClusterFirst
