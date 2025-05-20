@@ -92,7 +92,7 @@ export class LotsService {
 
     if (config.withAvailability) {
       const result = await query
-        .leftJoin(spot, eq(lot.id, spot.lotId))
+        .leftJoin(spot, and(eq(lot.id, spot.lotId), eq(spot.isAvailable, true)))
         .groupBy(lot.id);
 
       return result.map(this.serializeLot);
