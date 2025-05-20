@@ -6,7 +6,7 @@ spec:
   selector:
     app: app-service
   ports:
-    - name: app-service
+    - name: http
       port: 3000
       targetPort: 3000
   type: LoadBalancer
