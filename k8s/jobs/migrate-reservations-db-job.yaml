@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate-reservations-db
+  namespace: default
+  labels:
+    app: migrate-reservations-db
+spec:
+  ttlSecondsAfterFinished: 300 
+  completions: 1
+  template:
+    metadata:
+      name: migrate-reservations-db
+      labels:
+        app: migrate-reservations-db
+    spec:
+      containers:
+      - name: migration
+        image: josejaime5271/parker-reservations-service
+        imagePullPolicy: IfNotPresent
+        command: ['npm', 'run', 'db:push']
+        env:
+          - name: DB_URL
+            value: postgresql://reservationsservice:reservationsservicedbpassword@reservations-db:5432/reservationsservicedb?SCHEMA=public&connection_limit=20
+      restartPolicy: OnFailure
+      dnsPolicy: ClusterFirst

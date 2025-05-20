@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: lots-service-service
+  name: lots-service
 spec:
   selector:
     app: lots-service
   ports:
-    - name: http
+    - name: lots-service
       port: 3000
       targetPort: 3000
   type: ClusterIP
