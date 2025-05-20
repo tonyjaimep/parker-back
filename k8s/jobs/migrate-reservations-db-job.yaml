@@ -13,6 +13,8 @@ spec:
       name: migrate-reservations-db
       labels:
         app: migrate-reservations-db
+      annotations:
+        sidecar.istio.io/inject: "false"
     spec:
       containers:
       - name: migration

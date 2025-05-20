@@ -44,12 +44,14 @@ kubectl label namespace $NAMESPACE istio-injection=enabled --overwrite
 echo "📊 Installing Kiali and Grafana..."
 kubectl apply -f $ISTIO_DIR/samples/addons/kiali.yaml
 kubectl apply -f $ISTIO_DIR/samples/addons/grafana.yaml
+kubectl apply -f $ISTIO_DIR/samples/addons/prometheus.yaml
 
 # Step 8: Wait for Istio and add-ons to be ready
 echo "⏳ Waiting for Istio and add-ons to be ready..."
 kubectl wait --for=condition=ready pod -n istio-system -l app=istiod --timeout=120s
 kubectl wait --for=condition=ready pod -n istio-system -l app.kubernetes.io/name=kiali --timeout=120s
 kubectl wait --for=condition=ready pod -n istio-system -l app.kubernetes.io/name=grafana --timeout=120s
+kubectl wait --for=condition=ready pod -n istio-system -l app.kubernetes.io/name=prometheus --timeout=120s
 
 # Step 9: Apply user YAMLs
 if [ -d "$YAML_FOLDER" ]; then

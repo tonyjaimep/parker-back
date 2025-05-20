@@ -13,6 +13,8 @@ spec:
       name: migrate-lots-db
       labels:
         app: migrate-lots-db
+      annotations:
+        sidecar.istio.io/inject: "false"
     spec:
       containers:
       - name: migration
