@@ -6,13 +6,11 @@ import { UserPayload } from 'src/constants/types';
 
 @Injectable()
 export class BearerStrategy extends PassportStrategy(Strategy) {
-  constructor(
-    private readonly identityService: IdentityService,
-  ) {
+  constructor(private readonly identityService: IdentityService) {
     super();
   }
 
   async validate(token: string): Promise<UserPayload | null> {
-    return this.identityService.getUserFromToken(token)
+    return this.identityService.getUserFromToken(token);
   }
 }
