@@ -43,6 +43,8 @@ export class FirebaseService {
       if (firebaseError.code === 'auth/user-not-found') {
         return true;
       }
+
+      throw error;
     }
   }
 
