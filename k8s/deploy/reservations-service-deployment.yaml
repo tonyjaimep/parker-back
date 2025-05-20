@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reservations-service-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reservations-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: reservations-service
+    spec:
+      containers:
+        - name: reservations-service
+          env:
+            - name: DB_URL
+              value: postgresql://reservationsservice:reservationsservicedbpassword@reservations-db:5432/reservationsservicedb?SCHEMA=public&connection_limit=20
+          image: josejaime5271/parker-reservations-service
+          ports:
+            - containerPort: 3000
+              protocol: TCP

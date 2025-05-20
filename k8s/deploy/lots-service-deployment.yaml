@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lots-service-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lots-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: lots-service
+    spec:
+      containers:
+        - name: lots-service
+          env:
+            - name: DB_URL
+              value: postgresql://lotsservice:lotsservicedbpassword@lots-db:5432/lotsservicedb?SCHEMA=public&connection_limit=20
+            - name: RESERVATIONS_SERVICE_HOST
+              value: reservations-service
+            - name: RESERVATIONS_SERVICE_PORT
+              value: '3000'
+          image: josejaime5271/parker-lots-service
+          ports:
+            - containerPort: 3000
+              protocol: TCP

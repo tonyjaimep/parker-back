@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-service-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-service
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: app-service
+    spec:
+      containers:
+        - name: app-service
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: IDENTITY_SERVICE_HOST
+              value: identity-service
+            - name: IDENTITY_SERVICE_PORT
+              value: '3000'
+            - name: LOTS_SERVICE_HOST
+              value: lots-service
+            - name: LOTS_SERVICE_PORT
+              value: '3000'
+            - name: RESERVATIONS_SERVICE_HOST
+              value: reservations-service
+            - name: RESERVATIONS_SERVICE_PORT
+              value: '3000'
+          image: josejaime5271/parker-app-service
+          ports:
+            - containerPort: 3000
+              protocol: TCP

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: reservations-db
+spec:
+  selector:
+    app: reservations-db
+  type: ClusterIP
+  ports:
+  - name: reservations-db
+    protocol: TCP
+    port: 5432
+    targetPort: 5432
