@@ -107,13 +107,14 @@ export class LotsService {
     return this.dbService.db.delete(lot).where(eq(lot.id, lotId));
   }
 
-  serializeLot(lot: LotSelect) {
+  serializeLot(lot: LotSelect & { availability?: string}) {
     return {
       ...lot,
       location: {
         latitude: lot.location?.y,
         longitude: lot.location?.x,
       },
+      ...(lot.availability ? { availability: Number(lot.availability)} : undefined)
     };
   }
 

@@ -40,7 +40,7 @@ export class GetLotsQueryDto {
   @IsBoolean()
   @IsOptional()
   @Type(() => Boolean)
-  with_availability?: boolean;
+  withAvailability?: boolean;
 }
 
 export type LotEditableFields = Pick<LotInsert, 'address' | 'name'> & {

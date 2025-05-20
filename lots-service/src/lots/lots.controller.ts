@@ -8,11 +8,9 @@ export class LotsController {
   constructor(private readonly lotsService: LotsService) {}
 
   @MessagePattern('get_lots')
-  async getLots(
-    config: GetLotsQueryDto,
-  ) {
+  async getLots(config: GetLotsQueryDto) {
     return this.lotsService.getLots({
-      withAvailability: config.with_availability,
+      withAvailability: config.withAvailability,
       bounds: config.bounds,
     });
   }
@@ -47,7 +45,13 @@ export class LotsController {
   }
 
   @MessagePattern('get_is_lot_owner')
-  async getIsLotOwner({ id, userId }: { id: number, userId:number }) {
+  async getIsLotOwner({ id, userId }: { id: number; userId: number }) {
     return this.lotsService.isLotOwner(id, userId);
+  }
+
+  @MessagePattern('get_available_spot_id')
+  async getAvailableSpotId({ lotId }: { lotId: number }) {
+    const availableSpot = await this.lotsService.findAvailableSpot(lotId)
+    return availableSpot?.id || null;
   }
 }
