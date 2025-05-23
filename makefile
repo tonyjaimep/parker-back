@@ -12,8 +12,11 @@ stop:
 
 migrate-dbs:
 	docker compose exec identity-service npm run db:push
-	docker compose exec lots-service npm run db:push
+	docker compose exec lots-service npm run db:migrate
 	docker compose exec reservations-service npm run db:push
+
+seed-lots:
+	docker compose exec lots-service npm run db:seed-dev
 
 deploy-local:
 	eval $(minikube -p minikube docker-env)

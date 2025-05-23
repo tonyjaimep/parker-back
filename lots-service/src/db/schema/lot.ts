@@ -14,7 +14,7 @@ export const lot = pgTable('lot', {
   defaultPriceId: integer().references(() => price.id),
   address: varchar().notNull(),
   location: geometry({ type: 'point', mode: 'xy', srid: 4326 }).notNull(),
-  ownerId: integer().notNull(),
+  ownerId: integer(),
 });
 
 export const lotRelations = relations(lot, ({ one }) => ({

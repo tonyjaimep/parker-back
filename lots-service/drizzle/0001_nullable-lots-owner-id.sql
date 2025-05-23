@@ -1,0 +1,1 @@
+ALTER TABLE "lot" ALTER COLUMN "owner_id" DROP NOT NULL;

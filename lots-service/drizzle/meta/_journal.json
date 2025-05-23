@@ -3,17 +3,17 @@
   "dialect": "postgresql",
   "entries": [
     {
-      "idx": 0,
-      "version": "7",
-      "when": 1747729006169,
-      "tag": "0000_install_postgis",
-      "breakpoints": true
-    },
-    {
       "idx": 1,
       "version": "7",
       "when": 1747729029931,
-      "tag": "0001_init",
+      "tag": "0000_init",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1748013655222,
+      "tag": "0001_nullable-lots-owner-id",
       "breakpoints": true
     }
   ]
