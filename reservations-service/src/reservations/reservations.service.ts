@@ -23,7 +23,9 @@ export class ReservationsService {
       .values({
         spotId,
         userId,
-      });
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
+      })
+      .returning();
 
     return insertedReservations[0];
   }
@@ -35,7 +37,10 @@ export class ReservationsService {
       (await this.dbService.db.query.reservation.findFirst({
         where: and(
           eq(reservation.userId, userId),
-          or(isNull(reservation.endsAt), gt(reservation.endsAt, sql`now()`)),
+          and(
+            isNull(reservation.checkOutAt),
+            gt(reservation.expiresAt, sql`now()`),
+          ),
         ),
       })) ?? null;
 

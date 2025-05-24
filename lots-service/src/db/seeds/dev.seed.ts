@@ -61,7 +61,12 @@ async function main() {
     // @ts-expect-error -- returning() does not return the correct type
     const realLots: Array<LotSelect> = await db
       .insert(lot)
-      .values(realMockLots)
+      .values(
+        realMockLots.map((lot) => ({
+          ...lot,
+          location: sql`ST_SetSRID(ST_MakePoint(${lot.location.y}, ${lot.location.x}), 4326)`,
+        })),
+      )
       .returning();
 
     const lots = [...fakeLots, ...realLots];

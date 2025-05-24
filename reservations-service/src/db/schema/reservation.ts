@@ -5,10 +5,11 @@ export const reservation = pgTable('reservations', {
   id: serial().primaryKey(),
   userId: integer().notNull(),
   spotId: integer().notNull(),
+  expiresAt: timestamp(),
   createdAt: timestamp().defaultNow(),
   updatedAt: timestamp()
     .defaultNow()
     .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
-  startsAt: timestamp().defaultNow().notNull(),
-  endsAt: timestamp(),
+  checkInAt: timestamp(),
+  checkOutAt: timestamp(),
 });
