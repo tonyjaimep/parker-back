@@ -9,7 +9,7 @@ export class LotsController {
 
   @MessagePattern('get_lots')
   async getLots(config: GetLotsQueryDto) {
-    return this.lotsService.getLots({
+    return await this.lotsService.getLots({
       withAvailability: config.withAvailability,
       bounds: config.bounds,
     });
@@ -53,5 +53,10 @@ export class LotsController {
   async getAvailableSpotId({ lotId }: { lotId: number }) {
     const availableSpot = await this.lotsService.findAvailableSpot(lotId)
     return availableSpot?.id || null;
+  }
+
+  @MessagePattern('get_lot_from_spot_id')
+  async getLotFromSpotId({ spotId }: { spotId: number}) {
+    return this.lotsService.getLotFromSpotId(spotId);
   }
 }

@@ -107,14 +107,16 @@ export class LotsService {
     return this.dbService.db.delete(lot).where(eq(lot.id, lotId));
   }
 
-  serializeLot(lot: LotSelect & { availability?: string}) {
+  serializeLot(lot: LotSelect & { availability?: string }) {
     return {
       ...lot,
       location: {
         latitude: lot.location?.y,
         longitude: lot.location?.x,
       },
-      ...(lot.availability ? { availability: Number(lot.availability)} : undefined)
+      ...(lot.availability
+        ? { availability: Number(lot.availability) }
+        : undefined),
     };
   }
 
@@ -134,5 +136,20 @@ export class LotsService {
     }
 
     return null;
+  }
+
+  async getLotFromSpotId(spotId: number): Promise<LotSelect | null> {
+    const spotResult = await this.dbService.db.query.spot.findFirst({
+      where: eq(spot.id, spotId),
+    });
+
+    if (!spotResult) return null;
+
+    // @ts-ignore -- why does drizzle not like lots?
+    const lotResult: LotSelect = await this.dbService.db.query.lot.findFirst({
+      where: eq(lot.id, spotResult.lotId),
+    });
+
+    return lotResult;
   }
 }

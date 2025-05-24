@@ -44,3 +44,14 @@ export type LotEditableFields = {
   address: string;
   location: Coordinates;
 };
+
+export type LotPayload = {
+  id: number;
+  name: string;
+  address: string;
+  location: {
+    x: number;
+    y: number;
+  };
+  ownerId: number | null;
+};

@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { LOTS_SERVICE } from 'src/constants/services';
-import { Bounds, LotEditableFields } from './types';
+import { Bounds, LotEditableFields, LotPayload } from './types';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable()
@@ -54,6 +54,14 @@ export class LotsService {
       this.lotsClient.send<number | null>('get_available_spot_id', {
         lotId,
         time,
+      }),
+    );
+  }
+
+  async getLotFromSpotId(spotId: number): Promise<LotPayload | null> {
+    return firstValueFrom(
+      this.lotsClient.send<LotPayload | null>('get_lot_from_spot_id', {
+        spotId,
       }),
     );
   }
