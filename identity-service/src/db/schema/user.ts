@@ -1,4 +1,3 @@
-import { sql } from 'drizzle-orm';
 import { pgTable, serial, timestamp, varchar } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('users', {
@@ -9,5 +8,5 @@ export const user = pgTable('users', {
   createdAt: timestamp().defaultNow(),
   updatedAt: timestamp()
     .defaultNow()
-    .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+    .$onUpdate(() => new Date()),
 });
