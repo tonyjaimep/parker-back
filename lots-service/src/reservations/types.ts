@@ -6,4 +6,12 @@ export type ReservationPayload = {
   updatedAt: string;
   startsAt: string;
   endsAt: string;
+  status: ReservationStatus;
 };
+
+type ReservationStatus =
+  | 'pending'
+  | 'active'
+  | 'completed'
+  | 'cancelled'
+  | 'expired';

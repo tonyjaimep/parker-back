@@ -1,5 +1,18 @@
-import { serial, integer, pgTable, timestamp } from 'drizzle-orm/pg-core';
-import { sql } from 'drizzle-orm';
+import {
+  serial,
+  integer,
+  pgTable,
+  timestamp,
+  pgEnum,
+} from 'drizzle-orm/pg-core';
+
+export const reservationStatus = pgEnum('reservation_status', [
+  'pending',
+  'active',
+  'completed',
+  'cancelled',
+  'expired',
+]);
 
 export const reservation = pgTable('reservations', {
   id: serial().primaryKey(),
@@ -9,7 +22,9 @@ export const reservation = pgTable('reservations', {
   createdAt: timestamp().defaultNow(),
   updatedAt: timestamp()
     .defaultNow()
-    .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+    .$onUpdate(() => new Date()),
   checkInAt: timestamp(),
   checkOutAt: timestamp(),
+
+  status: reservationStatus('status').notNull().default('pending'),
 });

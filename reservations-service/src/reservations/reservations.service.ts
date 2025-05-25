@@ -1,10 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DbService } from 'src/db/db.service';
 import { reservation } from 'src/db/schema/reservation';
-import { and, eq, gt, isNull, sql } from 'drizzle-orm';
+import { and, eq, gt, inArray, isNull, lt, not, sql } from 'drizzle-orm';
 import { ReservationSelect } from './types';
 import { RABBITMQ_SERVICE } from 'src/constants';
 import { ClientProxy } from '@nestjs/microservices';
+import { Cron } from '@nestjs/schedule';
 
 @Injectable()
 export class ReservationsService {
@@ -49,11 +50,39 @@ export class ReservationsService {
           eq(reservation.userId, userId),
           and(
             isNull(reservation.checkOutAt),
-            gt(reservation.expiresAt, sql`now()`),
+            gt(reservation.expiresAt, new Date()),
+            not(
+              inArray(reservation.status, [
+                'expired',
+                'completed',
+                'cancelled',
+              ]),
+            ),
           ),
         ),
       })) ?? null;
 
     return result;
+  }
+
+  @Cron('* * * * *')
+  async handleExpiredReservations() {
+    const expiredReservations =
+      await this.dbService.db.query.reservation.findMany({
+        where: and(
+          isNull(reservation.checkOutAt),
+          lt(reservation.expiresAt, new Date()),
+          inArray(reservation.status, ['pending']),
+        ),
+      });
+
+    for (const expiredReservation of expiredReservations) {
+      await this.dbService.db
+        .update(reservation)
+        .set({ status: 'expired' })
+        .where(eq(reservation.id, expiredReservation.id));
+
+      this.rabbitMqClient.emit('reservation_expired', expiredReservation);
+    }
   }
 }

@@ -4,9 +4,11 @@ import { DrizzlePGModule } from '@knaadh/nestjs-drizzle-pg';
 import schema from './db/schema';
 import { DB_TAG } from './db/constants';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({ isGlobal: true }),
     DrizzlePGModule.registerAsync({
       tag: DB_TAG,

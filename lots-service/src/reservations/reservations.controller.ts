@@ -9,6 +9,11 @@ export class ReservationsController {
 
   @EventPattern('reservation_created')
   async handleReservationCreated(data: ReservationPayload) {
-    this.spotsService.markSpotAsUnavailable(data.spotId);
+    await this.spotsService.markSpotAsUnavailable(data.spotId);
+  }
+
+  @EventPattern('reservation_expired')
+  async handleReservationExpired(data: ReservationPayload) {
+    await this.spotsService.markSpotAsAvailable(data.spotId);
   }
 }
