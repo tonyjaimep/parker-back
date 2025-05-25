@@ -1,12 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { DbService } from 'src/db/db.service';
 import { reservation } from 'src/db/schema/reservation';
-import { and, eq, gt, isNull, or, sql } from 'drizzle-orm';
+import { and, eq, gt, isNull, sql } from 'drizzle-orm';
 import { ReservationSelect } from './types';
+import { RABBITMQ_SERVICE } from 'src/constants';
+import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class ReservationsService {
-  constructor(private dbService: DbService) {}
+  constructor(
+    private dbService: DbService,
+    @Inject(RABBITMQ_SERVICE)
+    private readonly rabbitMqClient: ClientProxy,
+  ) {}
 
   async createReservation(
     userId: number,
@@ -27,7 +33,11 @@ export class ReservationsService {
       })
       .returning();
 
-    return insertedReservations[0];
+    const createdReservation = insertedReservations[0];
+
+    this.rabbitMqClient.emit('reservation_created', createdReservation);
+
+    return createdReservation;
   }
 
   async getUserCurrentReservation(

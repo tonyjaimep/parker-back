@@ -7,6 +7,7 @@ services:
       NODE_ENV: development
       DB_URL: postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST-reservations-service-db}:${DB_PORT-5432}/${DB_DATABASE}?SCHEMA=public&connection_limit=${DB_CONNECTION_LIMIT-20}
       GOOGLE_APPLICATION_CREDENTIALS: '/usr/src/app/src/firebase/credentials/service-account-file.json'
+      RABBITMQ_URL: 'amqp://rabbitmq:5672'
     ports:
       - ${RESERVATIONS_SERVICE_PORT-3000}:3000
     depends_on:
@@ -32,5 +33,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  rabbitmq:
+    image: 'rabbitmq:4'
+
 volumes:
   reservations-db-data:

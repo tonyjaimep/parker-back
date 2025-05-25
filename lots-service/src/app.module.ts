@@ -5,6 +5,8 @@ import schema from './db/schema';
 import { DB_TAG } from './db/constants';
 import { HealthModule } from './health/health.module';
 import { LotsModule } from './lots/lots.module';
+import { ReservationsModule } from './reservations/reservations.module';
+import { SpotsModule } from './spots/spots.module';
 
 @Module({
   imports: [
@@ -29,6 +31,8 @@ import { LotsModule } from './lots/lots.module';
     ConfigModule.forRoot({ isGlobal: true }),
     HealthModule,
     LotsModule,
+    ReservationsModule,
+    SpotsModule,
   ],
   controllers: [],
   providers: [],
