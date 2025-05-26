@@ -49,4 +49,13 @@ export class ReservationsService {
       lot,
     };
   }
+
+  async cancelUserCurrentReservation(userId: number) {
+    return await firstValueFrom(
+      this.reservationsClient.send<ReservationPayload | null>(
+        'cancel_user_current_reservation',
+        { userId },
+      ),
+    );
+  }
 }

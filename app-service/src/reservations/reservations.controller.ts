@@ -26,4 +26,10 @@ export class ReservationsController {
   async getCurrentReservation(@User() user: UserPayload) {
     return this.reservationsService.getUserCurrentReservation(user.id);
   }
+
+  @Post('current/cancel')
+  @UseAuth()
+  async cancelCurrentUserReservation(@User() user: UserPayload) {
+    return this.reservationsService.cancelUserCurrentReservation(user.id);
+  }
 }

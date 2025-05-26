@@ -83,7 +83,7 @@
         "pending",
         "active",
         "completed",
-        "cancelled",
+        "canceled",
         "expired"
       ]
     }

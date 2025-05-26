@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DbService } from 'src/db/db.service';
 import { reservation } from 'src/db/schema/reservation';
-import { and, eq, gt, inArray, isNull, lt, not, sql } from 'drizzle-orm';
+import { and, eq, gt, inArray, isNull, lt, not } from 'drizzle-orm';
 import { ReservationSelect } from './types';
 import { RABBITMQ_SERVICE } from 'src/constants';
 import { ClientProxy } from '@nestjs/microservices';
@@ -52,11 +52,7 @@ export class ReservationsService {
             isNull(reservation.checkOutAt),
             gt(reservation.expiresAt, new Date()),
             not(
-              inArray(reservation.status, [
-                'expired',
-                'completed',
-                'cancelled',
-              ]),
+              inArray(reservation.status, ['expired', 'completed', 'canceled']),
             ),
           ),
         ),
@@ -84,5 +80,22 @@ export class ReservationsService {
 
       this.rabbitMqClient.emit('reservation_expired', expiredReservation);
     }
+  }
+
+  async cancelUserCurrentReservation(userId: number) {
+    const currentReservation = await this.getUserCurrentReservation(userId);
+
+    if (!currentReservation) {
+      throw new Error('User does not have active reservation');
+    }
+
+    const canceledReservation = await this.dbService.db
+      .update(reservation)
+      .set({ status: 'canceled' })
+      .where(eq(reservation.id, currentReservation.id)).returning();
+
+    this.rabbitMqClient.emit('reservation_canceled', currentReservation);
+
+    return canceledReservation
   }
 }
