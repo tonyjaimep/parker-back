@@ -150,6 +150,6 @@ export class LotsService {
       where: eq(lot.id, spotResult.lotId),
     });
 
-    return lotResult;
+    return this.serializeLot(lotResult);
   }
 }
